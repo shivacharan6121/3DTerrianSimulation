@@ -116,9 +116,8 @@ python terrianplot.py
 
 ### Video
 
-```
 https://github.com/user-attachments/assets/a821ccd5-96d9-45a1-aace-a3ff93e969bd
-```
+
 
 ### On-Screen HUD Displays
 
