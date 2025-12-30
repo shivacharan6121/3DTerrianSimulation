@@ -67,7 +67,7 @@ tvx,tvy,tvz
 ```
 project-root/
 │
-├── main.py                  # Simulation script
+├── terrianplot.py                  # Simulation script
 ├── missile/
 │   └── scene.gltf           # Missile 3D model
 ├── r1/
