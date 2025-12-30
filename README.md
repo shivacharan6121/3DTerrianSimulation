@@ -1,104 +1,186 @@
-```markdown
-# Missile Engagement 3D Visualizer
+---
 
-A high-fidelity 3D visualization tool for missile-target engagement scenarios. This project uses **PyVista** for rendering, **Trimesh** for 3D model handling, and **VTK** for procedural terrain generation. It transforms raw trajectory data (CSV) into a cinematic 3D animation.
+# Missile vs Target 3D Trajectory Visualizer (CSV-Driven)
 
-## ✨ Features
+A **file-driven 3D missile–target engagement visualizer** built using **PyVista**, **Trimesh**, **NumPy**, and **Pandas**.
+The simulation reads time-step state data from a CSV file and renders a full 3D engagement scene with terrain, models, trajectories, HUD telemetry, hit detection, and video recording.
 
-* **Interactive 3D Scene:** Full orbit, zoom, and pan capabilities during playback.
-* **Procedural Mountains:** Generates a unique terrain landscape using Perlin noise based on the data's spatial bounds.
-* **Real-time HUD:** On-screen display showing coordinates, speed (m/s), heading (deg), and separation distance.
-* **Dynamic Orientation:** Automatically calculates pitch and yaw from velocity vectors to ensure models align with their flight path.
-* **Automated Recording:** Export your simulation directly to an `.mp4` video file.
+This project is intended for **trajectory visualization, validation, and analysis** — not real-time guidance or control.
 
 ---
 
-## 🛠️ Installation
+## Features
 
-Ensure you have Python 3.8+ installed. You can install the required dependencies via pip:
+* 📁 **CSV-Driven Simulation**
 
-```bash
-pip install numpy pandas trimesh pyvista pyyaml PyQt5 vtk
+  * Reads missile and target position & velocity at each time step
+* 🚀 **3D GLTF Models**
+
+  * Missile and target models are aligned with their velocity vectors
+* 🧭 **Heading Angle Calculation**
+
+  * Missile heading relative to line-of-sight (LOS)
+* 🗺️ **Procedural Mountain Terrain**
+
+  * Perlin-noise-based terrain with realistic elevation coloring
+* 📈 **Trajectory Path Lines**
+
+  * Continuous path lines from start to end for verification
+* 🎥 **MP4 Video Recording**
+
+  * Automatically records the animation to a video file
+* 🎯 **Hit Detection**
+
+  * Engagement stops once kill distance is reached
+* 📊 **HUD Overlay**
+
+  * Real-time telemetry for missile, target, and engagement state
+
+---
+
+## CSV File Format
+
+The simulation requires a CSV file with the **exact column structure** shown below:
 
 ```
+time,
+mx,my,mz,
+mvx,mvy,mvz,
+tx,ty,tz,
+tvx,tvy,tvz
+```
 
-*Note: `PyQt5` serves as the GUI backend for the PyVista plotter window.*
+### Column Description
+
+| Column        | Meaning                   |
+| ------------- | ------------------------- |
+| `time`        | Simulation time (seconds) |
+| `mx,my,mz`    | Missile position (meters) |
+| `mvx,mvy,mvz` | Missile velocity (m/s)    |
+| `tx,ty,tz`    | Target position (meters)  |
+| `tvx,tvy,tvz` | Target velocity (m/s)     |
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
-The script expects the following directory structure for assets:
-
-```text
-.
-├── missile_sim.py        # The main script
+```
+project-root/
+│
+├── main.py                  # Simulation script
 ├── missile/
-│   └── scene.gltf        # Missile 3D model
+│   └── scene.gltf           # Missile 3D model
 ├── r1/
-│   └── scene.gltf        # Target aircraft 3D model
-└── data.csv              # Your trajectory data
-
+│   └── scene.gltf           # Target aircraft 3D model
+├── data/
+│   └── trajectory.csv       # Input CSV file
+└── README.md
 ```
 
 ---
 
-## 📊 CSV Data Requirements
+## Dependencies
 
-The input CSV must contain the following columns:
+Install required Python packages:
 
-| Column | Description |
-| --- | --- |
-| `time` | Simulation time in seconds |
-| `mx, my, mz` | Missile Position (X, Y, Z) |
-| `mvx, mvy, mvz` | Missile Velocity (Vx, Vy, Vz) |
-| `tx, ty, tz` | Target Position (X, Y, Z) |
-| `tvx, tvy, tvz` | Target Velocity (Vx, Vy, Vz) |
-
----
-
-## 🚀 How to Use
-
-1. **Prepare Models:** Place your `.gltf` models in the folders specified in the script.
-2. **Run the Script:**
 ```bash
-python missile_sim.py
-
+pip install numpy pandas pyvista trimesh vtk
 ```
 
+### Notes
 
-3. **Select File:** A Windows dialog will open. Select your trajectory CSV.
-4. **Watch & Record:** The simulation will play in the PyVista window and automatically save a file named `missile_vs_target.mp4` to your directory.
-
----
-
-## ⚙️ Configuration
-
-You can adjust these variables directly in the script to customize the simulation:
-
-* **Kill Distance:** `KILL_DIST = 35.0` (Distance in meters for a "Hit" status).
-* **Model Scale:** Adjust the `scale` argument in `load_gltf()` to resize the missile or aircraft.
-* **Terrain Height:** Change `noise.SetAmplitude(2000)` to make mountains taller or flatter.
-* **Framerate:** Change `framerate=50` in `plotter.open_movie()` to adjust video speed.
+* `tkinter` is required for file selection (usually included with Python)
+* A working OpenGL environment is required for PyVista rendering
 
 ---
 
-## 📐 Mathematics Overview
+## How to Run
 
-The simulation calculates the heading angle between the missile velocity and the Line-of-Sight (LOS) vector using the dot product formula:
+1. Ensure the GLTF models exist at:
 
-The 3D orientation is handled via a rotation matrix  to align the model's forward axis with the velocity vector.
+   * `./missile/scene.gltf`
+   * `./r1/scene.gltf`
+2. Prepare a CSV file matching the required format
+3. Run the script:
 
----
-
-## 📜 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
+```bash
+python terrianplot.py
 ```
 
+4. Select the CSV file when prompted
+5. The visualization window opens and video recording starts automatically
+
 ---
 
-**Would you like me to help you create a sample Python script to generate a dummy CSV file for testing this visualizer?**
+## Output
+
+### Video
 
 ```
+missile_vs_target.mp4
+```
+
+### On-Screen HUD Displays
+
+* Missile position (X, Y, Z)
+* Missile speed
+* Missile heading angle (deg)
+* Target position and speed
+* Separation distance
+* Simulation time
+* Engagement status (`TRACK` / `HIT`)
+
+---
+
+## Hit Detection Logic
+
+* Kill distance is defined as:
+
+```python
+KILL_DIST = 35.0  # meters
+```
+
+* The first time separation falls below this distance:
+
+  * Engagement status switches to **HIT**
+  * Animation continues briefly for visualization
+  * Trajectory paths remain visible
+
+---
+
+## Visualization Details
+
+* Gradient sky background
+* Directional sunlight for terrain shading
+* Smooth shading for missile and target models
+* Side-view camera (Y-Z plane) with zoom
+* Terrain scaled dynamically to trajectory bounds
+
+---
+
+## Known Limitations
+
+* No physics or guidance law computation
+* CSV data must be valid and time-ordered
+* Terrain is procedural (not geo-referenced)
+* Very large datasets may reduce frame rate
+
+---
+
+## Typical Use Cases
+
+* Missile–target engagement visualization
+* Trajectory verification and debugging
+* Post-processing simulation output
+* Demonstrations and technical presentations
+
+---
+
+## License
+
+This project is provided for **educational and research purposes only**.
+No warranty or operational suitability is implied.
+
+---
+
+Just say the word.
